@@ -11,7 +11,7 @@ In order to work with trackers that don't have standardized namings, [Jackett](h
 
 The problem is that any information that Jackett adds to the release name is not reflected on the imported release once it's downloaded and imported by Radarr as Radarr only uses the filename for assigning the custom formats. 
 
-###Example: 
+### Example: 
 
 Assuming a custom format named ``Dual`` applied to movies that are both ``[spanish]`` and ``[english]`` and a release named ``DeadPool (2016)``:
 1. Jackett finds ``DeadPool (2016)`` in a custom tracker and appends the language flags returning to Radarr the release name ``DeadPool (2016) [spanish] [english]``
