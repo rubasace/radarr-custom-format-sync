@@ -1,0 +1,3 @@
+[Radarr]
+url = http://localhost:3333
+key = 4384803r2808rvsvj023r9fjvvd0fjv
