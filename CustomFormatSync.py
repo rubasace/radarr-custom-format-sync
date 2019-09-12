@@ -129,5 +129,6 @@ for movieId, group in movieIdRecordMap:
             if updateResponse.status_code < 300:
                 logger.debug("Movie {0} updated succesfully: {1}".format(movieInfo["title"], grabbedCustomFormats))
             else:
-                logger.debug("Error while trying to update: {0}".format(movieInfo["title"]))
+                logger.error("Error while trying to update: {0}".format(movieInfo["title"]))
 
+logger.debug("Done!!")
