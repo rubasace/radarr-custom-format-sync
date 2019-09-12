@@ -14,9 +14,9 @@ The problem is that any information that Jackett adds to the release name is not
 ###Example: 
 
 Assuming a custom format named ``Dual`` applied to movies that are both ``[spanish]`` and ``[english]`` and a release named ``DeadPool (2016)``:
-1) Jackett finds ``DeadPool (2016)`` in a custom tracker and appends the language flags returning to Radarr the release name ``DeadPool (2016) [spanish] [english]``
-2) Radarr decides to download ``DeadPool (2016) [spanish] [english]`` as it's the one that matches the ``Dual`` custom format
-3) After the download is finished Radarr imports the release, but its release name is ``DeadPool (2016)`` so it doesn't add the ``Dual`` custom format to it.
+1. Jackett finds ``DeadPool (2016)`` in a custom tracker and appends the language flags returning to Radarr the release name ``DeadPool (2016) [spanish] [english]``
+2. Radarr decides to download ``DeadPool (2016) [spanish] [english]`` as it's the one that matches the ``Dual`` custom format
+3. After the download is finished Radarr imports the release, but its release name is ``DeadPool (2016)`` so it doesn't add the ``Dual`` custom format to it.
 
 This script solves this problem, checking the custom formats of each imported movie in the Radarr library and replacing it by the custom formats of the grabbed release instead.
 
