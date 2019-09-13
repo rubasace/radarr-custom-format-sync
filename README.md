@@ -4,6 +4,8 @@
 [![docker-commit](https://images.microbadger.com/badges/commit/rubasace/radarr-custom-format-sync.svg)](https://microbadger.com/images/rubasace/radarr-custom-format-sync "Get your own commit badge on microbadger.com")
 [![docker-version](https://images.microbadger.com/badges/version/rubasace/radarr-custom-format-sync.svg)](https://microbadger.com/images/rubasace/radarr-custom-format-sync "Get your own version badge on microbadger.com")
 
+
+[![Code Quality](https://api.codacy.com/project/badge/Grade/024ab70d128949a287b0e3c99ca5426a)](https://www.codacy.com/manual/rubasace/radarr-custom-format-sync?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=rubasace/radarr-custom-format-sync&amp;utm_campaign=Badge_Grade)
 ## Description
 Radarr Custom Format Sync checks Radarr history to correlate downloaded releases with the imported ones in order to put back all custom formats that might have been lost after the importing process.
 
