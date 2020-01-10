@@ -1,5 +1,6 @@
 import os
 import logging
+import pathlib
 import requests
 import json
 import configparser
@@ -30,6 +31,8 @@ logger.addHandler(fileHandler)
 consoleHandler = logging.StreamHandler(sys.stdout)
 consoleHandler.setFormatter(logFormatter)
 logger.addHandler(consoleHandler)
+
+
 ########################################################################################################################
 
 
@@ -46,6 +49,52 @@ def ConfigSectionMap(section):
             dict1[option] = None
     return dict1
 
+
+def get_custom_format_names(movie_info):
+    return list(map(lambda e: e["name"], movie_info['movieFile']["quality"]["customFormats"]))
+
+
+def rename_file(movie_info, appends):
+    current_path = get_current_path(movie_info)
+    current_filename = get_current_filename(movie_info)
+
+    file_parts = os.path.splitext(current_filename)
+    new_filename = file_parts[0]
+    for custom_format in get_custom_format_names(movie_info):
+        postfix = appends.get(custom_format.lower(), "")
+        if postfix not in file_parts[0]:
+            new_filename += postfix
+
+    new_filename = "{}{}".format(new_filename, file_parts[1])
+    if new_filename != current_filename:
+        original_path = os.path.join(current_path, current_filename)
+        new_path = os.path.join(current_path, new_filename)
+        logger.debug("{} will be moved to {}".format(str(original_path), str(new_path)))
+        os.rename(original_path, new_path)
+        logger.info("{} renamed to {}".format(str(original_path), str(new_path)))
+
+
+def get_current_path(movie_info):
+    path = pathlib.Path(movie_info['path'])
+    return str(path.parent)
+
+
+def get_current_filename(movie_info):
+    return movie_info['movieFile']['relativePath']
+
+
+def refresh_movie(movie_info):
+    movie_id = movie_info['id']
+    title = movie_info["title"]
+    command = {"movieId": movie_id, "name": "refreshMovie"}
+    refresh_response = radarrSession.post("{0}/api/command".format(radarr_url),
+                                          data=json.dumps(command))
+    if refresh_response.status_code < 300:
+        logger.debug("Movie {} refreshed succesfully".format(title))
+    else:
+        logger.error("Error while refreshing movie: {}".format(title))
+
+
 logger.debug('CustomFormatSync Version {}'.format(VER))
 
 Config = configparser.ConfigParser()
@@ -60,6 +109,7 @@ Config.read(settingsFilename)
 
 radarr_url = ConfigSectionMap("Radarr")['url']
 radarr_key = ConfigSectionMap("Radarr")['key']
+appends = ConfigSectionMap("Append")
 
 radarrSession = requests.Session()
 radarrSession.headers.update({'x-api-key': radarr_key})
@@ -110,25 +160,25 @@ for movieId, group in movieIdRecordMap:
             if downloadId == recordDownloadId and GRABBED_EVENT_TYPE == movieRecord[EVENT_TYPE]:
                 quality = movieRecord.get(QUALITY, {CUSTOM_FORMATS: None})
                 grabbedCustomFormats = quality.get(CUSTOM_FORMATS, None)
-                break
         elif IMPORTED_EVENT_TYPE == movieRecord[EVENT_TYPE]:
             downloadId = recordDownloadId
-            quality = movieRecord.get(QUALITY, {CUSTOM_FORMATS: None})
-            currentCustomFormats = quality.get(CUSTOM_FORMATS, None)
     if grabbedCustomFormats is not None:
-        movieInfo = movieIdInfoMap[movieId]
-        currentFile = movieInfo.get("movieFile", None)
+        movie_info = movieIdInfoMap[movieId]
+        currentFile = movie_info.get("movieFile", None)
         if currentFile is None:
-            logger.debug("Movie file not found for movie: {}".format(movieInfo["title"]))
+            logger.debug("Movie file not found for movie: {}".format(movie_info["title"]))
         elif grabbedCustomFormats != currentFile["quality"]["customFormats"]:
-            movieFile = movieInfo["movieFile"]
-            movieFileId = movieFile["id"]
-            movieFile["quality"]["customFormats"] = grabbedCustomFormats
-            updateResponse = radarrSession.put('{0}/api/movieFile/{1}'.format(radarr_url, movieFileId),
-                                               data=json.dumps(movieFile))
+            movie_file = movie_info["movieFile"]
+            movie_file_id = movie_file["id"]
+            movie_file["quality"]["customFormats"] = grabbedCustomFormats
+
+            rename_file(movie_info, appends)
+
+            updateResponse = radarrSession.put('{0}/api/movieFile/{1}'.format(radarr_url, movie_file_id),
+                                               data=json.dumps(movie_file))
             if updateResponse.status_code < 300:
-                logger.debug("Movie {0} updated succesfully: {1}".format(movieInfo["title"], grabbedCustomFormats))
+                logger.info("Movie {0} updated successfully: {1}".format(movie_info["title"], grabbedCustomFormats))
             else:
-                logger.error("Error while trying to update: {0}".format(movieInfo["title"]))
+                logger.error("Error while trying to update: {0}".format(movie_info["title"]))
 
 logger.debug("Done!!")
