@@ -4,8 +4,6 @@ FROM python:3-alpine
 ARG BUILD_DATE
 ARG VCS_REF
 
-RUN apk add bash
-
 # Good docker practice, plus we get microbadger badges
 LABEL org.label-schema.build-date=$BUILD_DATE \
        org.label-schema.vcs-url="https://github.com/rubasace/radarr-custom-format-sync.git" \

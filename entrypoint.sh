@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Create /Config.txt based on the environment variables we were passed
 
