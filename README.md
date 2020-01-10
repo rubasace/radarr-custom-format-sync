@@ -24,17 +24,26 @@ Assuming a custom format named ``Dual`` applied to movies that are both ``[spani
 
 This script solves this problem, checking the custom formats of each imported movie in the Radarr library and replacing it by the custom formats of the grabbed release instead.
 
+Optionally, it's possible to append strings to the filenames when they match a custom format. This is very useful to guarantee that, in case of reimporting the file, the custom formats won't be lost.
+
 ## Configuration
 ### Example Config.txt
 ```ini
 [Radarr]
 url = http://changeme.com:3333
 key = 4384803r2808rvsvj023r9fjvvd0fjv3
+[Append]
+english = [english]
+spanish = [spanish]
+dual = [dual]
 ```
 ### Configuration steps
+#### Standalone
 1. Edit the Config.txt file and replace your servers URL and API key for Radarr under the ``[Radarr]`` section.
-2. Alternatively, if running the application with Docker, provide the values as the envars ``RADARR_URL``and ``RADARR_KEY`` (The ``Config.txt`` file will be generated automatically inside the container)
-
+2. Optionally, add flags to append to the file names per custom format (useful for possible reimports where history gets lost)
+#### Docker
+1. Alternatively, if running the application with Docker, provide the values as the envars ``RADARR_URL``and ``RADARR_KEY`` (The ``Config.txt`` file will be generated automatically inside the container)
+2. Optionally, add the flags to append to the file names as envars ``APPEND_X`` being ``X`` the custom format name (case insensitive). For example: ``APPEND_ENGLISH=[english]`` will append ``[english]`` to file names with custom format ``english``
 ## How to Run
 ### Standalone
 Recomended to run using cron every 15 minutes or an interval of your preference.
