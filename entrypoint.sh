@@ -10,7 +10,7 @@ key = $RADARR_KEY
 EOF
 
 for var in "${!APPEND_@}"; do
-    printf '%s=%s\n' "$var" "${!var}" >> /Config.txt
+    printf '%s=%s\n' "${var#"APPEND_"}" "${!var}" >> /Config.txt
 done
 
 # Now execute the sync script in a loop, waiting DELAY before running again
