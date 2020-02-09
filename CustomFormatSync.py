@@ -20,7 +20,8 @@ EVENT_TYPE = "eventType"
 
 ########################################################################################################################
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+log_level = os.getenv("LOG_LEVEL", "INFO")
+logger.setLevel(log_level)
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 
 os.makedirs("./logs", exist_ok=True)
