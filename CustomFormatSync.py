@@ -118,15 +118,16 @@ radarrSession.headers.update({'x-api-key': radarr_key})
 radarrSession.trust_env = False
 radarrMovies = radarrSession.get('{0}/api/movie'.format(radarr_url))
 if radarrMovies.status_code >= 300:
-    logger.error('Movies retrieve returned status code {}'.format(radarrMovies.status_code))
-    sys.exit(0)
+    logger.error('Movies retrieve returned status code {}\n{}'.format(radarrMovies.status_code, radarrMovies.json()))
+    sys.exit(1)
 
 pageSize = 999999999
 movieHistoryResponse = radarrSession.get(
     '{0}/api/history?page=1&pageSize={1}&sortKey=movie.title&sortDir=desc'.format(radarr_url, pageSize))
 if movieHistoryResponse.status_code >= 300:
-    logger.error('History retrieve returned status code {}'.format(radarrMovies.status_code))
-    sys.exit(0)
+    logger.error('History retrieve returned status code {}\n{}'.format(movieHistoryResponse.status_code,
+                                                                       movieHistoryResponse.json()))
+    sys.exit(2)
 
 movieHistory = movieHistoryResponse.json()
 records = movieHistory["records"]
