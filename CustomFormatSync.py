@@ -77,7 +77,7 @@ def rename_file(movie_info, appends):
 
 def get_current_path(movie_info):
     path = pathlib.Path(movie_info['path'])
-    return str(path.parent)
+    return str(path)
 
 
 def get_current_filename(movie_info):
