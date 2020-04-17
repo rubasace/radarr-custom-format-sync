@@ -6,12 +6,13 @@ import json
 import configparser
 import sys
 import itertools
+import time
 
 QUALITY = "quality"
 
 CUSTOM_FORMATS = "customFormats"
 
-VER = '0.0.1'
+VER = '1.0.0'
 
 IMPORTED_EVENT_TYPE = "downloadFolderImported"
 GRABBED_EVENT_TYPE = "grabbed"
@@ -67,12 +68,27 @@ def rename_file(movie_info, appends):
             new_filename += postfix
 
     new_filename = "{}{}".format(new_filename, file_parts[1])
-    if new_filename != current_filename:
+    changed = new_filename != current_filename
+    if changed:
         original_path = os.path.join(current_path, current_filename)
         new_path = os.path.join(current_path, new_filename)
         logger.debug("{} will be moved to {}".format(str(original_path), str(new_path)))
         os.rename(original_path, new_path)
         logger.info("{} renamed to {}".format(str(original_path), str(new_path)))
+
+    return new_filename, changed
+
+
+def refresh_movie(movie_info):
+    movie_id = movie_info["id"]
+    title = movie_info["title"]
+    command = {"movieId": movie_id, "name": "refreshMovie"}
+    refresh_response = radarrSession.post("{0}/api/command".format(radarr_url),
+                                          data=json.dumps(command))
+    if refresh_response.status_code < 300:
+        logger.debug("Movie {} refreshed succesfully".format(title))
+    else:
+        logger.error("Error while refreshing movie: {}".format(title))
 
 
 def get_current_path(movie_info):
@@ -96,7 +112,7 @@ def refresh_movie(movie_info):
         logger.error("Error while refreshing movie: {}".format(title))
 
 
-logger.debug('CustomFormatSync Version {}'.format(VER))
+logger.info('CustomFormatSync Version {}'.format(VER))
 
 Config = configparser.ConfigParser()
 
@@ -174,7 +190,18 @@ for movieId, group in movieIdRecordMap:
             movie_file_id = movie_file["id"]
             movie_file["quality"]["customFormats"] = grabbedCustomFormats
 
-            rename_file(movie_info, appends)
+            relative_path, changed = rename_file(movie_info, appends)
+
+            if changed:
+                # Need to call it twice to catch renames (first will stop finding the file and second will find new one)
+                refresh_movie(movie_info)
+
+                # Need to wait some time so it does catch file changes properly
+                time.sleep(20)
+
+                refresh_movie(movie_info)
+
+            movie_file['relativePath'] = relative_path
 
             updateResponse = radarrSession.put('{0}/api/movieFile/{1}'.format(radarr_url, movie_file_id),
                                                data=json.dumps(movie_file))
@@ -183,4 +210,4 @@ for movieId, group in movieIdRecordMap:
             else:
                 logger.error("Error while trying to update: {0}".format(movie_info["title"]))
 
-logger.debug("Done!!")
+logger.info("Done!!")
