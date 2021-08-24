@@ -1,5 +1,7 @@
 # Radarr Custom Format Sync
 
+> **_IMPORTANT:_**  This tool was created to fix an issue in the way Radarr v2 was dealing with custom formats while importing the downloaded files, as explained bellow. That issue is solved in the way Radarr v3 processes the downloaded files, hence this tool isn't nor compatible neither needed for Radarr v3.
+
 [![docker-data](https://images.microbadger.com/badges/image/rubasace/radarr-custom-format-sync.svg)](https://microbadger.com/images/rubasace/radarr-folder-organizer "Get your own image badge on microbadger.com")
 [![docker-commit](https://images.microbadger.com/badges/commit/rubasace/radarr-custom-format-sync.svg)](https://microbadger.com/images/rubasace/radarr-custom-format-sync "Get your own commit badge on microbadger.com")
 [![docker-version](https://images.microbadger.com/badges/version/rubasace/radarr-custom-format-sync.svg)](https://microbadger.com/images/rubasace/radarr-custom-format-sync "Get your own version badge on microbadger.com")
@@ -63,4 +65,4 @@ docker run -d --name radarr-custom-format-sync \
 ```
 ## Requirements
 * Python 3.4 or greater
-     * Radarr server
+* Radarr v2 server
